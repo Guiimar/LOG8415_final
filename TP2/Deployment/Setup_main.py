@@ -41,18 +41,16 @@ if __name__ == '__main__':
 
     #---------------------------------------------------Get default VPC ID-----------------------------------------------------
     #Get default vpc description : 
-    """default_vpc = ec2_serviceclient.describe_vpcs(
+    default_vpc = ec2_serviceclient.describe_vpcs(
         Filters=[
             {'Name':'isDefault',
              'Values':['true']},
         ]
-    )"""
-    #default_vpc_desc = default_vpc.get("Vpcs")
+    )
+    default_vpc_desc = default_vpc.get("Vpcs")
    
     # Get default vpc id : 
-    #vpc_id = default_vpc_desc[0].get('VpcId')
-    vpc_id='vpc-0d882582a823a8039'
-    print(vpc_id)
+    vpc_id = default_vpc_desc[0].get('VpcId')
 
 
     #--------------------------------------Try create a security group--------------------------------
@@ -81,8 +79,7 @@ if __name__ == '__main__':
         ])
 
         security_group_id = (sg_dict.get("SecurityGroups")[0]).get("GroupId")
-    #security_group_id ='sg-0a1fad11c5472746b'
-    #print(security_group_id)
+
     
 
     #--------------------------------------Pass flask deployment script into the user_data parameter ------------------------------
