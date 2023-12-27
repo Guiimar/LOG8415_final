@@ -143,6 +143,7 @@ def create_instance_ec2(num_instances,ami_id,
         print ('Instance: '+str(instance_function)+str(i+1),' having the Id: ',instance[0].id,'and having the ip',public_ip,' in Availability Zone: ', Availabilityzons[i], 'is created')
     return instances
 
+#function that include the command to send to the machine to implement the command standalone
 def commands_standalone():
     list_of_commands_standalone = [
         "sudo apt-get -y update",
@@ -245,9 +246,9 @@ def commands_cluster_master_start_sakila():
     '''sudo /opt/mysqlcluster/home/mysqlc/bin/mysql -e "USE mysql; UPDATE user SET plugin='mysql_native_password' WHERE User='root'; FLUSH PRIVILEGES;SET PASSWORD FOR 'root'@'localhost' = PASSWORD('password');"''',
     'wget https://downloads.mysql.com/docs/sakila-db.tar.gz',
     'tar -xvf sakila-db.tar.gz',
-    '''sudo /opt/mysqlcluster/home/mysqlc/bin/mysql -h 127.0.0.1 -e "SOURCE sakila-db/sakila-schema.sql;'-u root -ppassword''',
-    '''sudo /opt/mysqlcluster/home/mysqlc/bin/mysql -h 127.0.0.1 -e "SOURCE sakila-db/sakila-data.sql;'-u root -ppassword''',
-    '''sudo /opt/mysqlcluster/home/mysqlc/bin/mysql -h 127.0.0.1 -e "USE sakila;'-u root -ppassword''',
+    '''sudo /opt/mysqlcluster/home/mysqlc/bin/mysql -h 127.0.0.1 -e "SOURCE sakila-db/sakila-schema.sql;'-u root -p password''',
+    '''sudo /opt/mysqlcluster/home/mysqlc/bin/mysql -h 127.0.0.1 -e "SOURCE sakila-db/sakila-data.sql;'-u root -p password''',
+    '''sudo /opt/mysqlcluster/home/mysqlc/bin/mysql -h 127.0.0.1 -e "USE sakila;'-u root -p password''',
     ]
     return commands
 
@@ -255,7 +256,7 @@ def command_benchmark():
     #https://www.jamescoyle.net/how-to/1131-benchmark-mysql-server-performance-with-sysbench
     commands=[
     'sudo sysbench oltp_read_write --table-size=1000000 --threads=6 --mysql-db=sakila --mysql-user=root --db-driver=mysql --mysql-host=127.0.0.1 --mysql-password=password prepare'
-    'sudo sysbench oltp_read_write --table-size=1000000 --threads=6  --mysql-db=sakila --mysql-user=root --db-driver=mysql --mysql-host=127.0.0.1 --mysql-password=password run >> cluster_rw.txt'
+    'sudo sysbench oltp_read_write --table-size=1000000 --threads=6  --mysql-db=sakila --mysql-user=root --db-driver=mysql --mysql-host=127.0.0.1 --mysql-password=password run > /home/ubuntu/results_cluster.txt'
     'sudo sysbench oltp_read_write --table-size=1000000 --threads=6  --mysql-db=sakila --mysql-user=root --db-driver=mysql --mysql-host=127.0.0.1 --mysql-password=password cleanup '
     ]
     return commands

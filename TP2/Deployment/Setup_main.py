@@ -55,7 +55,7 @@ if __name__ == '__main__':
     print(vpc_id)
 
 
-    #--------------------------------------Try create a security group with all traffic inbouded--------------------------------
+    #--------------------------------------Try create a security group--------------------------------
     try:
 
         security_group_id = create_security_group("All traffic sec_group","lab3_security_group",vpc_id,ec2_serviceresource)  

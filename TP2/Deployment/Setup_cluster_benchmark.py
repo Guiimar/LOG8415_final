@@ -81,8 +81,6 @@ if __name__ == '__main__':
         ])
 
         security_group_id = (sg_dict.get("SecurityGroups")[0]).get("GroupId")
-    #security_group_id ='sg-0a1fad11c5472746b'
-    #print(security_group_id)
     
 
     #--------------------------------------Pass flask deployment script into the user_data parameter ------------------------------
@@ -179,7 +177,7 @@ if __name__ == '__main__':
     cluster_benchmark=command_benchmark()
     ssh_connexion_command(c,DNS_public_address['Master_cluster'],k,cluster_benchmark,False)
 
-    
+
 
 
 

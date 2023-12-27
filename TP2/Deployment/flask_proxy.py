@@ -49,7 +49,7 @@ def send_query(request,ip_address,master_ip):
         tunnel.start()
         # pymysql connection 
         con=pymysql.connect(host=master_ip,
-                                user='root',
+                                user='myapp',
                                 password='password',
                                 database='sakila',
                                 port='3306',

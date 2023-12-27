@@ -1,22 +1,27 @@
 from flask import Flask, request
 import requests
 
+
+#stock adress of the proxy to send the request
 public_ip_address_proxy=''
 private_ip_address_proxy=''
-proxy_port=''
+proxy_port=80
 
+#creation of the flask app that receives the request
 app= Flask(__name__)
 
+#creation of the route
 @app.route('/query',methods=['POST'])
 
 def query():
     try:
-        #creation of the url
         #Get the request data
         request_data = request.get_json()
 
+        #get the type of the request
         request_type = request_data.get('type')
 
+        #verify if request is in the righ type
         if request_type not in ['direct','random','customized']:
              return "Type is not valid",400
         
