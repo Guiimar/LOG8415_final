@@ -89,7 +89,9 @@ def get_fastest_slave(nodes):
     return fastest_node
 
 @app.route('/direct',methods=['POST'])
-#the request is directly forwarded to the master node
+
+#the request is directly forwarded to the master node in the direct hit mode
+
 def direct_master():
     try:
         return send_query(request,master_ip,master_ip)
@@ -97,7 +99,7 @@ def direct_master():
         return str(e),500
 
 @app.route('/random',methods=['POST'])
-#the request is directly forwarded to a randomized node
+#the request is directly forwarded to a randomized node among the slave nodes
 def randomized():
     try:
         if test_write(request):
