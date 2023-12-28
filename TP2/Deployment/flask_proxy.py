@@ -93,6 +93,7 @@ def get_fastest_slave(nodes):
 #the request is directly forwarded to the master node in the direct hit mode
 
 def direct_master():
+    
     try:
         return send_query(request,master_ip,master_ip)
     except Exception as e:

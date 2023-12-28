@@ -1,7 +1,6 @@
 import configparser
 import boto3
 from utils import *
-import base64
 import os
 import json
 from threading import Thread

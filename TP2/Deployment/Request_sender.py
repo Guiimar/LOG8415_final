@@ -7,7 +7,7 @@ from datetime import date
 import time
 
 #Function to send a POST request to the gatekeeper
-# The info list contains the ip, the port of the orchestrator and then the data to send in the request 
+ 
 
 def send_request_to_gatekeeper(ip,port,json_data):
     try:

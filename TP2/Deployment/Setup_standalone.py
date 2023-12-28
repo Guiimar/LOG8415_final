@@ -1,12 +1,10 @@
 import configparser
 import boto3
 from utils import *
-import base64
 import os
 import json
 from threading import Thread
 import re
-import sshtunnel
 from sshtunnel import SSHTunnelForwarder
 import paramiko
 
@@ -53,7 +51,8 @@ if __name__ == '__main__':
 
 
     #--------------------------------------Try create a security group with all traffic inbouded--------------------------------
-  
+
+  #create a standard security group for the standalone server
     try:
         security_group_id = create_security_group("All traffic sec_group","lab1_security_group",vpc_id,ec2_serviceresource)  
     
@@ -77,7 +76,6 @@ if __name__ == '__main__':
         ])
 
         security_group_id = (sg_dict.get("SecurityGroups")[0]).get("GroupId")
-    
 
     #--------------------------------------Pass flask deployment script into the user_data parameter ------------------------------
     with open('standalone_sysbench.sh', 'r') as f :
