@@ -91,6 +91,6 @@ if __name__ == '__main__':
     print("\n .................Creating standalone.............. :  ")
 
     # Creation of a t2 micro instance for MySQL-standalone
-    standalone_mysql= create_instance_ec2(1,ami_id, instance_type,key_pair_name,ec2_serviceresource,security_group_id,Availabilityzones_Cluster1,"Standalone",user_data_standalone)
+    standalone_mysql= create_instance_ec2(1,ami_id, instance_type,key_pair_name,ec2_serviceresource,security_group_id,Availabilityzones_Cluster1,"Standalone_instance",user_data_standalone)
     time.sleep(10)
     print('\n ...............standalone launched........................\n')

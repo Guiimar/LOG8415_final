@@ -42,12 +42,12 @@ def create_keypair(key_pair_name, client):
 
 
 #---------------------------------------------To re check----------------------------------------------
-'Function to create a new vpc (Maybe no need for this, just use default vpc)'
+#Function to create a new vpc (Maybe no need for this, just use default vpc)'
 def create_vpc(CidrBlock,resource):
    VPC_Id=resource.create_vpc(CidrBlock=CidrBlock).id
    return VPC_Id
 
-'Function to create security group (Maybe no need for this, just use get securty group of default vpc)'
+#Function to create security group 
 def create_security_group(Description,Groupe_name,vpc_id,resource):
     Security_group_ID=resource.create_security_group(
         Description=Description,
@@ -56,7 +56,7 @@ def create_security_group(Description,Groupe_name,vpc_id,resource):
     
     Security_group=resource.SecurityGroup(Security_group_ID)
     
-    #Add an inbounded allowing inbounded traffics of tcp protocol, and ports 22,80,5000,5001, and all Ipranges.  
+    #Add an inbounded allowing inbounded traffics of tcp protocol, and ports 22,80 and all Ipranges.
     Security_group.authorize_ingress(
          IpPermissions=[
             {'FromPort':22,
@@ -71,34 +71,77 @@ def create_security_group(Description,Groupe_name,vpc_id,resource):
             },
             ]
     )
-    resource.authorize_security_group_egress(
-                GroupId=Security_group_ID,
-                IpPermissions=[
-                {'FromPort':22,
+    return Security_group_ID
+
+#Function to create security for proxy
+def create_security_group_proxy(Description,Groupe_name,vpc_id,resource):
+    Security_group_ID=resource.create_security_group(
+        Description=Description,
+        GroupName=Groupe_name,
+        VpcId=vpc_id).id
+    
+    Security_group=resource.SecurityGroup(Security_group_ID)
+    
+    #Add an inbounded allowing inbounded traffics of tcp protocol, and ports 22,80 only from the gatekeeper
+    Security_group.authorize_ingress(
+         IpPermissions=[
+            {'FromPort':22,
                 'ToPort':22,
                 'IpProtocol':'tcp',
                 'IpRanges':[{'CidrIp':'0.0.0.0/0'}]
                 },
-                {'FromPort':80,
-                'ToPort':80,
-                'IpProtocol':'tcp',
-                'IpRanges':[{'CidrIp':'0.0.0.0/0'}]
-                },
-                {'FromPort':1186,
-                'ToPort':1186,
-                'IpProtocol':'tcp',
-                'IpRanges':[{'CidrIp':'0.0.0.0/0'}]
-                },
+                {
+                'FromPort': -1,
+                'ToPort': -1,
+                'IpProtocol': 'ICMP',
+                'IpRanges': [
+                {
+                'CidrIp': '0.0.0.0/0'},
+                        ]
+                    }
+            ]
+    )
+    return Security_group_ID
+
+#Function to create security for nodes
+def create_security_group_nodes(Description,Groupe_name,vpc_id,resource):
+    Security_group_ID=resource.create_security_group(
+        Description=Description,
+        GroupName=Groupe_name,
+        VpcId=vpc_id).id
+    
+    Security_group=resource.SecurityGroup(Security_group_ID)
+    
+    #Add an inbounded allowing inbounded traffics of tcp protocol, and ports 22,80 only from the gatekeeper
+    Security_group.authorize_ingress(
+         IpPermissions=[
                 {'FromPort':3306,
                 'ToPort':3306,
                 'IpProtocol':'tcp',
                 'IpRanges':[{'CidrIp':'0.0.0.0/0'}]
-                }
-                ]
-            )
-
+                },
+                {
+                'FromPort': -1,
+                'ToPort': -1,
+                'IpProtocol': 'ICMP',
+                'IpRanges': [
+                {
+                'CidrIp': '0.0.0.0/0'},
+                        ]
+                    },
+                    {'FromPort':22,
+             'ToPort':22,
+             'IpProtocol':'tcp',
+             'IpRanges':[{'CidrIp':'0.0.0.0/0'}]
+            },
+            {'FromPort':1186,
+             'ToPort':1186,
+             'IpProtocol':'tcp',
+             'IpRanges':[{'CidrIp':'0.0.0.0/0'}]
+            },
+            ]
+    )
     return Security_group_ID
-
 #------------------------------------------------End----------------------------------------------------
 
 

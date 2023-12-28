@@ -55,32 +55,60 @@ if __name__ == '__main__':
 
     #--------------------------------------Try create a security group--------------------------------
     try:
-
-        security_group_id = create_security_group("All traffic sec_group","lab3_security_group",vpc_id,ec2_serviceresource)  
-    
+        security_group_id_gatekeeper= create_security_group("All traffic sec_group","lab_gatekeeper",vpc_id,ec2_serviceresource)  
     except :
         print("Exception")
         #Get the standard security group from the default VPC :
         sg_dict = ec2_serviceclient.describe_security_groups(Filters=[
-            {
-                'Name': 'vpc-id',
+            { 'Name': 'vpc-id',
                 'Values': [
                     vpc_id,
                 ]
             },
-
-        {
-                'Name': 'group-name',
+        {'Name': 'group-name',
                 'Values': [
-                    "lab3_security_group",
+                    "lab_gatekeeper",
                 ]
             },
-
         ])
+        security_group_id_gatekeeper = (sg_dict.get("SecurityGroups")[0]).get("GroupId")
 
-        security_group_id = (sg_dict.get("SecurityGroups")[0]).get("GroupId")
-
-    
+    try:
+        security_group_id_proxy= create_security_group("All traffic sec_group","lab_proxy",vpc_id,ec2_serviceresource)  
+    except :
+        print("Exception")
+        #Get the standard security group from the default VPC :
+        sg_dict = ec2_serviceclient.describe_security_groups(Filters=[
+            { 'Name': 'vpc-id',
+                'Values': [
+                    vpc_id,
+                ]
+            },
+        {'Name': 'group-name',
+                'Values': [
+                    "lab_proxy",
+                ]
+            },
+        ])
+        security_group_id_proxy = (sg_dict.get("SecurityGroups")[0]).get("GroupId")
+    try:
+        security_group_id_nodes= create_security_group("All traffic sec_group","lab_nodes",vpc_id,ec2_serviceresource)  
+    except :
+        print("Exception")
+        #Get the standard security group from the default VPC :
+        sg_dict = ec2_serviceclient.describe_security_groups(Filters=[
+            { 'Name': 'vpc-id',
+                'Values': [
+                    vpc_id,
+                ]
+            },
+        {'Name': 'group-name',
+                'Values': [
+                    "lab_nodes",
+                ]
+            },
+        ])
+        security_group_id_nodes = (sg_dict.get("SecurityGroups")[0]).get("GroupId")
 
     #--------------------------------------Pass flask deployment script into the user_data parameter ------------------------------
 
@@ -100,9 +128,9 @@ if __name__ == '__main__':
     print("\n Creating cluster :  ")
 
     #Creation of 4 instances : to install the MySQL Cluster 
-    manager=create_instance_ec2(1,ami_id, instance_type,key_pair_name,ec2_serviceresource,security_group_id,Availabilityzones_Cluster1,"Manager",user_data_manager)
+    manager=create_instance_ec2(1,ami_id, instance_type,key_pair_name,ec2_serviceresource,security_group_id_nodes,Availabilityzones_Cluster1,"Manager",user_data_manager)
     print(manager)
-    workers_cluster=create_instance_ec2(3,ami_id, instance_type,key_pair_name,ec2_serviceresource,security_group_id,Availabilityzones_Cluster1,"my-sql-cluster-workers",user_data_manager)
+    workers_cluster=create_instance_ec2(3,ami_id, instance_type,key_pair_name,ec2_serviceresource,security_group_id_nodes,Availabilityzones_Cluster1,"my-sql-cluster-workers",user_data_manager)
     print(workers_cluster)
     print('\n ........instances launched......\n')
     time.sleep(10)
@@ -180,7 +208,7 @@ if __name__ == '__main__':
     new_script=add_key(key_str,ud_proxy)
 
     #Creation of the proxy
-    proxy=create_instance_ec2(1,ami_id, "t2.large",key_pair_name,ec2_serviceresource,security_group_id,Availabilityzones_Cluster1,"Proxy",new_script)
+    proxy=create_instance_ec2(1,ami_id, "t2.large",key_pair_name,ec2_serviceresource,security_group_id_proxy,Availabilityzones_Cluster1,"Proxy",new_script)
     proxy_public_ip=proxy[0][1]
     proxy_private_ip=proxy[0][2]
 
@@ -192,17 +220,25 @@ if __name__ == '__main__':
     print("Starting to update gatekeeper_script")
     script_gatekeeper_updated=update_flask_gatekeeper_script(ud_gatekeeper,proxy_public_ip,proxy_private_ip)
     #Creation of the gatekeeper
-    gatekeeper=create_instance_ec2(1,ami_id, "t2.large",key_pair_name,ec2_serviceresource,security_group_id,Availabilityzones_Cluster1,"Gatekeeper",script_gatekeeper_updated)
+    gatekeeper=create_instance_ec2(1,ami_id, "t2.large",key_pair_name,ec2_serviceresource,security_group_id_gatekeeper,Availabilityzones_Cluster1,"Gatekeeper",script_gatekeeper_updated)
     gatekeeper_public_ip=gatekeeper[0][1]
-    #modify rule for proxy
-    ec2_serviceresource.authorize_security_group_ingress(GroupName='secure_proxy',
-                                                         IpPermissions=[
-                                                            {'FromPort':0,
-                                                            'ToPort':0,
-                                                            'IpProtocol':-1,
-                                                            'IpRanges':[{'CidrIp':gatekeeper_public_ip}]
-                                                            },
-                                                            ])
+
+    #modify to secure the proxy
+    ec2_serviceresource.authorize_security_group_ingress(
+        GroupId=security_group_id_proxy,
+        IpPermissions=[
+        {'FromPort': 80,
+            'ToPort': 80,
+            'IpProtocol': 'tcp',
+            'IpRanges':[{'CidrIp':gatekeeper_public_ip}],
+            },
+        {'FromPort':3306,
+        'ToPort':3306,
+        'IpProtocol':'tcp',
+        'IpRanges':[{'CidrIp':ip_private_address['Master_cluster']}]
+                },]
+    )
+
 
 
 

@@ -100,9 +100,9 @@ if __name__ == '__main__':
     print("\n Creating cluster :  ")
 
     #Creation of 4 instances : to install the MySQL Cluster 
-    manager=create_instance_ec2(1,ami_id, instance_type,key_pair_name,ec2_serviceresource,security_group_id,Availabilityzones_Cluster1,"Manager",user_data_manager)
+    manager=create_instance_ec2(1,ami_id, instance_type,key_pair_name,ec2_serviceresource,security_group_id,Availabilityzones_Cluster1,"Manager_benchmark",user_data_manager)
     print(manager)
-    workers_cluster=create_instance_ec2(3,ami_id, instance_type,key_pair_name,ec2_serviceresource,security_group_id,Availabilityzones_Cluster1,"my-sql-cluster-workers",user_data_manager)
+    workers_cluster=create_instance_ec2(3,ami_id, instance_type,key_pair_name,ec2_serviceresource,security_group_id,Availabilityzones_Cluster1,"my-sql-cluster-workers_benchmark",user_data_manager)
     print(workers_cluster)
     print('\n ........instances launched......\n')
     time.sleep(10)
@@ -155,7 +155,7 @@ if __name__ == '__main__':
         commands_common=commands_cluster_common_steps()
         ssh_connexion_command(c,address,k,commands_common)
 
-    #Continuer setup for manager
+    #Continue setup for manager
     command_cluster_deployment=commands_cluster_master(DNS_private_address)
     ssh_connexion_command(c,DNS_public_address['Master_cluster'],k,command_cluster_deployment)
 
