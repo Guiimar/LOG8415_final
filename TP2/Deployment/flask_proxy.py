@@ -102,10 +102,12 @@ def direct_master():
 #the request is directly forwarded to a randomized node among the slave nodes
 def randomized():
     try:
+        #test if it is a write request in this case forward to the master node
         if test_write(request):
                 return send_query(request,master_ip,master_ip)
-        
+        #if it is not a write request choose randomly among the slaves
         random_node=random.choice(private_nodes_ip)
+        #send the request
         return send_query(request,random_node,master_ip)
     except Exception as e:
         return str(e),500
@@ -115,12 +117,16 @@ def randomized():
 #the request is directly forwarded to the fastest responding node 
 def customized():
     try:
+        #test if it is a write request in this case forward to the master node
         if test_write(request):
             return send_query(request,master_ip,master_ip)
+        #if it is not a write request choose the fastest slave
         node_fastest=get_fastest_slave(private_nodes_ip)
+        #send the request
         send_query(request,node_fastest,master_ip)
     except Exception as e:
         return str(e),500
-
+    
+#launch the flask address
 if __name__=='__main__':
-    app.run(host='127.0.0.1',port=5000)
+    app.run(host='0.0.0.0',port=80)
